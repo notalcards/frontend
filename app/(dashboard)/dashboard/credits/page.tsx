@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -38,7 +38,7 @@ const TARIFF_POPULAR: Record<string, boolean> = {
   pro: false,
 };
 
-export default function CreditsPage() {
+function CreditsPageInner() {
   const searchParams = useSearchParams();
   const status = searchParams.get('status');
 
@@ -158,5 +158,13 @@ export default function CreditsPage() {
         Оплата через ЮКассу · Visa, Mastercard, МИР, СБП, ЮMoney
       </Typography>
     </Box>
+  );
+}
+
+export default function CreditsPage() {
+  return (
+    <Suspense>
+      <CreditsPageInner />
+    </Suspense>
   );
 }
