@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
@@ -31,6 +32,7 @@ import { removeToken } from '@/app/lib/auth';
 const DRAWER_WIDTH = 240;
 
 const navItems = [
+  { label: 'Мои профили', icon: <AccountCircleIcon />, href: '/dashboard/profiles' },
   { label: 'Натальная карта', icon: <AutoAwesomeIcon />, href: '/dashboard/natal' },
   { label: 'Гороскопы', icon: <CalendarMonthIcon />, href: '/dashboard/horoscope' },
   { label: 'Транзиты', icon: <CompareArrowsIcon />, href: '/dashboard/transits' },
