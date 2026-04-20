@@ -49,7 +49,7 @@ export default function ProfilesPage() {
       await api.post('/profiles', {
         name: form.name,
         birth_date: form.birth_date,
-        birth_time: form.birth_time || null,
+        birth_time: form.birth_time ? form.birth_time + ':00' : null,
         birth_place: form.birth_place,
       });
       setForm(emptyForm);
