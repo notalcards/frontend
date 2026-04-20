@@ -22,6 +22,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import PeopleIcon from '@mui/icons-material/People';
 import HistoryIcon from '@mui/icons-material/History';
+import DiamondIcon from '@mui/icons-material/Diamond';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
@@ -38,6 +39,7 @@ const navItems = [
   { label: 'Венера', icon: <FavoriteIcon />, href: '/dashboard/venus' },
   { label: 'Синастрия', icon: <PeopleIcon />, href: '/dashboard/synastry' },
   { label: 'История', icon: <HistoryIcon />, href: '/dashboard/history' },
+  { label: 'Кредиты', icon: <DiamondIcon />, href: '/dashboard/credits' },
 ];
 
 interface User {
@@ -129,7 +131,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Chip
                 label={`💎 ${user.credits} кредитов`}
                 size="small"
-                sx={{ bgcolor: 'rgba(124,58,237,0.15)', color: '#C4B5FD', border: '1px solid rgba(124,58,237,0.3)' }}
+                onClick={() => router.push('/dashboard/credits')}
+                sx={{ bgcolor: 'rgba(124,58,237,0.15)', color: '#C4B5FD', border: '1px solid rgba(124,58,237,0.3)', cursor: 'pointer' }}
               />
               <Typography variant="body2" color="text.secondary">
                 {user.name}
