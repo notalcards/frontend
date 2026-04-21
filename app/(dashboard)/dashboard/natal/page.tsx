@@ -32,7 +32,7 @@ export default function NatalPage() {
     setLoading(true);
     try {
       const { data } = await api.post('/charts/generate', { type: 'natal', profile_id: profileId });
-      setChart(data);
+      setChart(data.chart ?? data);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при построении карты');
