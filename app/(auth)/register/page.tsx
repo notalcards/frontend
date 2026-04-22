@@ -10,6 +10,9 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
@@ -18,6 +21,7 @@ import { setToken } from '@/app/lib/auth';
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+  const [consent, setConsent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -28,6 +32,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (!consent) {
+      setError('Необходимо согласие на обработку персональных данных');
+      return;
+    }
     if (form.password !== form.password_confirmation) {
       setError('Пароли не совпадают');
       return;
@@ -81,7 +89,30 @@ export default function RegisterPage() {
             <TextField label="Email" type="email" value={form.email} onChange={handleChange('email')} required fullWidth />
             <TextField label="Пароль" type="password" value={form.password} onChange={handleChange('password')} required fullWidth />
             <TextField label="Подтвердите пароль" type="password" value={form.password_confirmation} onChange={handleChange('password_confirmation')} required fullWidth />
-            <Button type="submit" variant="contained" size="large" fullWidth disabled={loading}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={consent}
+                  onChange={e => setConsent(e.target.checked)}
+                  size="small"
+                  sx={{ color: '#7C3AED', '&.Mui-checked': { color: '#7C3AED' } }}
+                />
+              }
+              label={
+                <Typography variant="body2" color="text.secondary">
+                  Я даю согласие на{' '}
+                  <MuiLink component={Link} href="/privacy" sx={{ color: '#9F67FF' }}>
+                    обработку персональных данных
+                  </MuiLink>{' '}
+                  в соответствии с{' '}
+                  <MuiLink component={Link} href="/terms" sx={{ color: '#9F67FF' }}>
+                    пользовательским соглашением
+                  </MuiLink>
+                </Typography>
+              }
+              sx={{ alignItems: 'flex-start', mt: 1 }}
+            />
+            <Button type="submit" variant="contained" size="large" fullWidth disabled={loading || !consent}>
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Создать аккаунт'}
             </Button>
           </Box>
