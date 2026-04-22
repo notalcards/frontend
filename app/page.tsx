@@ -15,6 +15,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Divider from '@mui/material/Divider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Footer from '@/app/components/Footer';
 
 const features = [
   {
@@ -249,12 +250,7 @@ export default function Home() {
         </Grid>
       </Container>
 
-      {/* Footer */}
-      <Box sx={{ borderTop: '1px solid rgba(124,58,237,0.15)', py: 4, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.5 }}>
-          © 2024 NatalCharts · натальные-карты.рф
-        </Typography>
-      </Box>
+      <Footer />
 
     </Box>
   );

@@ -28,6 +28,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
 import { removeToken } from '@/app/lib/auth';
+import Footer from '@/app/components/Footer';
 
 const DRAWER_WIDTH = 240;
 
@@ -163,8 +164,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {drawer}
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8, bgcolor: 'background.default', minHeight: '100vh' }}>
-        {children}
+      <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', mt: 8, bgcolor: 'background.default', minHeight: '100vh' }}>
+        <Box sx={{ p: 3, flex: 1 }}>{children}</Box>
+        <Footer />
       </Box>
     </Box>
   );
