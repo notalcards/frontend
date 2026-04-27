@@ -134,7 +134,7 @@ export default function Home() {
               {step === 0 && (
                 <Box>
                   <Grid container spacing={2} sx={{ mb: 3 }}>
-                    <Grid item xs={12} sm={7}>
+                    <Grid size={{ xs: 12, sm: 7 }}>
                       <TextField
                         label="Дата рождения" type="date" fullWidth required
                         value={birthDate} onChange={e => setBirthDate(e.target.value)}
@@ -142,7 +142,7 @@ export default function Home() {
                         sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={5}>
+                    <Grid size={{ xs: 12, sm: 5 }}>
                       <TextField
                         label="Время рождения" type="time" fullWidth
                         value={birthTime} onChange={e => setBirthTime(e.target.value)}
@@ -237,7 +237,7 @@ export default function Home() {
         </Typography>
         <Grid container spacing={3}>
           {features.map(f => (
-            <Grid item xs={12} sm={6} md={4} key={f.title}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={f.title}>
               <Card sx={{ bgcolor: '#1A1033', border: '1px solid rgba(124,58,237,0.15)', borderRadius: 3, height: '100%', transition: 'border-color .2s', '&:hover': { borderColor: 'rgba(124,58,237,0.5)' } }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography sx={{ fontSize: 36, mb: 2, lineHeight: 1 }}>{f.icon}</Typography>
@@ -260,7 +260,7 @@ export default function Home() {
         </Typography>
         <Grid container spacing={3} justifyContent="center">
           {tariffs.map(t => (
-            <Grid item xs={12} sm={6} md={4} key={t.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={t.name}>
               <Card sx={{ bgcolor: t.popular ? 'rgba(124,58,237,0.15)' : '#1A1033', border: t.popular ? '2px solid #7C3AED' : '1px solid rgba(124,58,237,0.2)', borderRadius: 3, height: '100%', position: 'relative' }}>
                 {t.popular && (
                   <Box sx={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', bgcolor: '#7C3AED', color: '#fff', px: 2, py: 0.5, borderRadius: 10, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>

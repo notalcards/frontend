@@ -46,7 +46,7 @@ export default function ProgressionsPage() {
       <Card>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <ProfileSelector value={profileId} onChange={setProfileId} />
-          <TextField label="Дата прогрессии" type="date" value={date} onChange={(e) => setDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth />
+          <TextField label="Дата прогрессии" type="date" value={date} onChange={(e) => setDate(e.target.value)} slotProps={{ inputLabel: { shrink: true } }} fullWidth />
           <Box display="flex" alignItems="center" gap={2}>
             <Button variant="contained" size="large" onClick={handleGenerate} disabled={loading || !profileId} sx={{ minWidth: 200 }}>
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Построить прогрессии'}

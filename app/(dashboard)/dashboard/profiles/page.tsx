@@ -102,7 +102,7 @@ export default function ProfilesPage() {
             <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>Новый профиль</Typography>
             <Box component="form" onSubmit={handleSubmit}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     label="Имя (например: Я, Мама, Иван)"
                     fullWidth required
@@ -110,7 +110,7 @@ export default function ProfilesPage() {
                     onChange={e => setForm({ ...form, name: e.target.value })}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     label="Место рождения (город)"
                     fullWidth required
@@ -119,24 +119,24 @@ export default function ProfilesPage() {
                     placeholder="Москва"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     label="Дата рождения"
                     type="date"
                     fullWidth required
                     value={form.birth_date}
                     onChange={e => setForm({ ...form, birth_date: e.target.value })}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{ inputLabel: { shrink: true } }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     label="Время рождения (необязательно)"
                     type="time"
                     fullWidth
                     value={form.birth_time}
                     onChange={e => setForm({ ...form, birth_time: e.target.value })}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{ inputLabel: { shrink: true } }}
                     helperText="Если не знаете — оставьте пустым"
                   />
                 </Grid>
@@ -166,7 +166,7 @@ export default function ProfilesPage() {
       ) : (
         <Grid container spacing={2}>
           {profiles.map(profile => (
-            <Grid item xs={12} sm={6} md={4} key={profile.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={profile.id}>
               <Card sx={{
                 bgcolor: '#1A1033',
                 border: profile.is_default ? '1px solid rgba(124,58,237,0.6)' : '1px solid rgba(124,58,237,0.2)',
