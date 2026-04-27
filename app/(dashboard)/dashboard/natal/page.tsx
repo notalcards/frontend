@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
@@ -20,11 +21,22 @@ interface ChartData {
   profile?: { name: string };
 }
 
-export default function NatalPage() {
+function NatalPageInner() {
+  const searchParams = useSearchParams();
   const [profileId, setProfileId] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
+  const [autoTriggered, setAutoTriggered] = useState(false);
+
+  const auto = searchParams.get('auto') === '1';
+
+  useEffect(() => {
+    if (auto && profileId && !autoTriggered) {
+      setAutoTriggered(true);
+      handleGenerate();
+    }
+  }, [auto, profileId, autoTriggered]);
 
   const handleGenerate = async () => {
     if (!profileId) { setError('Выберите профиль'); return; }
@@ -104,5 +116,13 @@ export default function NatalPage() {
         />
       )}
     </Box>
+  );
+}
+
+export default function NatalPage() {
+  return (
+    <Suspense>
+      <NatalPageInner />
+    </Suspense>
   );
 }

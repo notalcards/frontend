@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -18,12 +19,17 @@ import { useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
 import { setToken } from '@/app/lib/auth';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const birthDate = searchParams.get('date') || '';
+  const birthTime = searchParams.get('time') || '';
+  const birthPlace = searchParams.get('place') || '';
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -44,7 +50,23 @@ export default function RegisterPage() {
     try {
       const { data } = await api.post('/register', form);
       setToken(data.token);
-      router.push('/dashboard/natal');
+
+      // If birth data was passed from wizard — create profile automatically
+      if (birthDate) {
+        try {
+          await api.post('/profiles', {
+            name: form.name || 'Я',
+            birth_date: birthDate,
+            birth_time: birthTime ? birthTime + ':00' : null,
+            birth_place: birthPlace || 'Не указано',
+          });
+          router.push('/dashboard/natal?auto=1');
+        } catch {
+          router.push('/dashboard/natal');
+        }
+      } else {
+        router.push('/dashboard/profiles');
+      }
     } catch (err: unknown) {
       const errors = (err as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response?.data;
       if (errors?.errors) {
@@ -81,6 +103,13 @@ export default function RegisterPage() {
               sx={{ bgcolor: 'rgba(124,58,237,0.2)', color: '#C4B5FD', border: '1px solid rgba(124,58,237,0.4)' }}
             />
           </Box>
+
+          {birthDate && (
+            <Alert severity="info" sx={{ mb: 2, bgcolor: 'rgba(124,58,237,0.1)', color: '#C4B5FD', border: '1px solid rgba(124,58,237,0.3)' }}>
+              После регистрации мы автоматически создадим профиль и откроем натальную карту
+              {birthDate && ` (${birthDate}${birthTime ? ', ' + birthTime : ''}${birthPlace ? ', ' + birthPlace : ''})`}
+            </Alert>
+          )}
 
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -126,5 +155,13 @@ export default function RegisterPage() {
         </CardContent>
       </Card>
     </Box>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }

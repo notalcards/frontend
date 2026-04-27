@@ -83,9 +83,11 @@ export default function Home() {
   const router = useRouter();
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
+  const [birthPlace, setBirthPlace] = useState('');
 
   const handleStart = () => {
-    router.push(`/register?date=${birthDate}&time=${birthTime}`);
+    const params = new URLSearchParams({ date: birthDate, time: birthTime, place: birthPlace });
+    router.push(`/register?${params.toString()}`);
   };
 
   return (
@@ -156,12 +158,23 @@ export default function Home() {
                     sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                   />
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Город рождения"
+                    fullWidth
+                    value={birthPlace}
+                    onChange={e => setBirthPlace(e.target.value)}
+                    placeholder="Например: Москва"
+                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
+                  />
+                </Grid>
               </Grid>
               <Button
                 variant="contained"
                 fullWidth
                 size="large"
                 onClick={handleStart}
+                disabled={!birthDate}
                 sx={{ py: 1.5, fontSize: 16, fontWeight: 700 }}
               >
                 Продолжить →
