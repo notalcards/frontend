@@ -12,6 +12,7 @@ import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
+import NatalChartSVG from '@/app/components/NatalChartSVG';
 import api from '@/app/lib/api';
 
 interface ChartData {
@@ -19,6 +20,14 @@ interface ChartData {
   interpretation: string;
   created_at: string;
   profile?: { name: string };
+  result_data?: {
+    subject_data: Record<string, unknown>;
+    chart_data: {
+      planetary_positions: { name: string; absolute_longitude: number; is_retrograde?: boolean }[];
+      house_cusps: { house: number; absolute_longitude: number }[];
+      aspects: { point1: string; point2: string; aspect_type: string }[];
+    };
+  };
 }
 
 function NatalPageInner() {
@@ -53,6 +62,8 @@ function NatalPageInner() {
     }
   };
 
+  const hasChartData = chart?.result_data?.chart_data?.planetary_positions?.length;
+
   return (
     <Box>
       <Typography variant="h4" fontWeight={700} mb={1}>🌟 Натальная карта</Typography>
@@ -81,7 +92,7 @@ function NatalPageInner() {
         </CardContent>
       </Card>
 
-      {/* Decorative zodiac wheel */}
+      {/* Decorative zodiac wheel placeholder */}
       {!chart && !loading && (
         <Box sx={{ textAlign: 'center', mt: 6, opacity: 0.3 }}>
           <svg width="240" height="240" viewBox="0 0 240 240">
@@ -108,12 +119,30 @@ function NatalPageInner() {
       )}
 
       {chart && (
-        <ChartResult
-          title="🌟 Натальная карта"
-          profileName={chart.profile?.name}
-          interpretation={chart.interpretation}
-          createdAt={chart.created_at}
-        />
+        <>
+          {hasChartData && (
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <NatalChartSVG
+                  resultData={chart.result_data as Parameters<typeof NatalChartSVG>[0]['resultData']}
+                  profileName={chart.profile?.name}
+                  birthDate={
+                    chart.result_data?.subject_data
+                      ? `${chart.result_data.subject_data.day}.${chart.result_data.subject_data.month}.${chart.result_data.subject_data.year}`
+                      : undefined
+                  }
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          <ChartResult
+            title="🌟 Натальная карта"
+            profileName={chart.profile?.name}
+            interpretation={chart.interpretation}
+            createdAt={chart.created_at}
+          />
+        </>
       )}
     </Box>
   );
