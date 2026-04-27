@@ -13,81 +13,81 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Divider from '@mui/material/Divider';
+import Alert from '@mui/material/Alert';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import CircularProgress from '@mui/material/CircularProgress';
+import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
+import api from '@/app/lib/api';
+import { setToken } from '@/app/lib/auth';
 
 const features = [
-  {
-    icon: '🌟',
-    title: 'Натальная карта',
-    desc: 'Полный разбор вашей карты рождения: планеты, дома, аспекты и детальная интерпретация от ИИ',
-  },
-  {
-    icon: '⚡',
-    title: 'Транзиты и прогрессии',
-    desc: 'Текущие планетарные влияния на вашу карту — прогнозы на любую дату',
-  },
-  {
-    icon: '☀️',
-    title: 'Соляр',
-    desc: 'Карта года рождения: главные темы, возможности и вызовы на ближайшие 12 месяцев',
-  },
-  {
-    icon: '💕',
-    title: 'Синастрия',
-    desc: 'Астрологическая совместимость двух людей — полный анализ отношений',
-  },
-  {
-    icon: '🌙',
-    title: 'Гороскопы',
-    desc: 'Персональные прогнозы на день, неделю и месяц на основе вашей натальной карты',
-  },
-  {
-    icon: '💫',
-    title: 'Циклы Венеры',
-    desc: 'Циклы любви и денег: лучшие периоды для отношений, финансов и творчества',
-  },
+  { icon: '🌟', title: 'Натальная карта', desc: 'Полный разбор вашей карты рождения: планеты, дома, аспекты и интерпретация от ИИ' },
+  { icon: '⚡', title: 'Транзиты и прогрессии', desc: 'Текущие планетарные влияния на вашу карту — прогнозы на любую дату' },
+  { icon: '☀️', title: 'Соляр', desc: 'Карта года рождения: главные темы, возможности и вызовы на 12 месяцев' },
+  { icon: '💕', title: 'Синастрия', desc: 'Астрологическая совместимость двух людей — полный анализ отношений' },
+  { icon: '🌙', title: 'Гороскопы', desc: 'Персональные прогнозы на день, неделю и месяц на основе вашей натальной карты' },
+  { icon: '💫', title: 'Циклы Венеры', desc: 'Циклы любви и денег: лучшие периоды для отношений, финансов и творчества' },
 ];
 
 const tariffs = [
-  {
-    name: 'Старт',
-    price: '299 ₽',
-    credits: 500,
-    desc: 'Попробуй все возможности',
-    features: ['5 расчётов карт', 'Интерпретации от ИИ', 'История карт'],
-    popular: false,
-  },
-  {
-    name: 'Базовый',
-    price: '699 ₽',
-    credits: 1500,
-    desc: 'Для регулярного использования',
-    features: ['15 расчётов карт', 'Интерпретации от ИИ', 'История карт', 'Синастрия'],
-    popular: true,
-  },
-  {
-    name: 'Профи',
-    price: '990 ₽',
-    credits: 3000,
-    desc: 'Максимум возможностей',
-    features: ['30 расчётов карт', 'Интерпретации от ИИ', 'История карт', 'Синастрия', 'Приоритетный доступ'],
-    popular: false,
-  },
+  { name: 'Старт', price: '299 ₽', credits: 500, desc: 'Попробуй все возможности', features: ['5 расчётов карт', 'Интерпретации от ИИ', 'История карт'], popular: false },
+  { name: 'Базовый', price: '699 ₽', credits: 1500, desc: 'Для регулярного использования', features: ['15 расчётов карт', 'Интерпретации от ИИ', 'История карт', 'Синастрия'], popular: true },
+  { name: 'Профи', price: '990 ₽', credits: 3000, desc: 'Максимум возможностей', features: ['30 расчётов карт', 'Интерпретации от ИИ', 'История карт', 'Синастрия', 'Приоритетный доступ'], popular: false },
 ];
 
-const steps = ['Дата и время рождения', 'Место рождения', 'Готово'];
+const steps = ['Дата рождения', 'Место рождения', 'Регистрация'];
+
+const stepperSx = {
+  '& .MuiStepLabel-label': { color: '#A0A0C0', fontSize: 12 },
+  '& .MuiStepLabel-label.Mui-active': { color: '#C4B5FD' },
+  '& .MuiStepLabel-label.Mui-completed': { color: '#86EFAC' },
+  '& .MuiStepIcon-root': { color: 'rgba(124,58,237,0.3)' },
+  '& .MuiStepIcon-root.Mui-active': { color: '#7C3AED' },
+  '& .MuiStepIcon-root.Mui-completed': { color: '#22C55E' },
+};
 
 export default function Home() {
   const router = useRouter();
+  const [step, setStep] = useState(0);
+
+  // Step 1
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
+
+  // Step 2
   const [birthPlace, setBirthPlace] = useState('');
 
-  const handleStart = () => {
-    const params = new URLSearchParams({ date: birthDate, time: birthTime, place: birthPlace });
-    router.push(`/register?${params.toString()}`);
+  // Step 3
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleRegister = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data } = await api.post('/register', { name, email, password, password_confirmation: password });
+      setToken(data.token);
+      await api.post('/profiles', {
+        name: name || 'Я',
+        birth_date: birthDate,
+        birth_time: birthTime ? birthTime + ':00' : null,
+        birth_place: birthPlace || 'Не указано',
+      });
+      router.push('/dashboard/natal?auto=1');
+    } catch (err: any) {
+      const errors = err.response?.data?.errors;
+      setError(errors ? Object.values(errors).flat().join(', ') : err.response?.data?.message || 'Ошибка регистрации');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,72 +116,114 @@ export default function Home() {
           Персональные астрологические карты и прогнозы на основе точных расчётов и анализа ИИ
         </Typography>
 
-        {/* Step-by-step start */}
+        {/* Wizard */}
         <Container maxWidth="sm">
           <Card sx={{ bgcolor: '#1A1033', border: '1px solid rgba(124,58,237,0.4)', borderRadius: 3, p: 1 }}>
             <CardContent>
-              <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>
-                ✨ Построй свою натальную карту
-              </Typography>
-              <Stepper activeStep={0} alternativeLabel sx={{ mb: 4 }}>
+              <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>✨ Построй свою натальную карту</Typography>
+
+              <Stepper activeStep={step} alternativeLabel sx={{ mb: 4 }}>
                 {steps.map(label => (
                   <Step key={label}>
-                    <StepLabel sx={{
-                      '& .MuiStepLabel-label': { color: '#A0A0C0', fontSize: 12 },
-                      '& .MuiStepIcon-root': { color: 'rgba(124,58,237,0.3)' },
-                      '& .MuiStepIcon-root.Mui-active': { color: '#7C3AED' },
-                    }}>{label}</StepLabel>
+                    <StepLabel sx={stepperSx}>{label}</StepLabel>
                   </Step>
                 ))}
               </Stepper>
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={7}>
+
+              {/* Step 1 */}
+              {step === 0 && (
+                <Box>
+                  <Grid container spacing={2} sx={{ mb: 3 }}>
+                    <Grid item xs={12} sm={7}>
+                      <TextField
+                        label="Дата рождения" type="date" fullWidth required
+                        value={birthDate} onChange={e => setBirthDate(e.target.value)}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={5}>
+                      <TextField
+                        label="Время рождения" type="time" fullWidth
+                        value={birthTime} onChange={e => setBirthTime(e.target.value)}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        helperText="Необязательно"
+                        sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Button variant="contained" fullWidth size="large" disabled={!birthDate}
+                    onClick={() => setStep(1)} sx={{ py: 1.5, fontWeight: 700 }}>
+                    Далее →
+                  </Button>
+                </Box>
+              )}
+
+              {/* Step 2 */}
+              {step === 1 && (
+                <Box>
                   <TextField
-                    label="Дата рождения"
-                    type="date"
-                    fullWidth
-                    value={birthDate}
-                    onChange={e => setBirthDate(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    label="Время рождения"
-                    type="time"
-                    fullWidth
-                    value={birthTime}
-                    onChange={e => setBirthTime(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    helperText="Необязательно"
-                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Город рождения"
-                    fullWidth
-                    value={birthPlace}
-                    onChange={e => setBirthPlace(e.target.value)}
+                    label="Город рождения" fullWidth
+                    value={birthPlace} onChange={e => setBirthPlace(e.target.value)}
                     placeholder="Например: Москва"
-                    sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
+                    sx={{ mb: 3, '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                   />
-                </Grid>
-              </Grid>
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={handleStart}
-                disabled={!birthDate}
-                sx={{ py: 1.5, fontSize: 16, fontWeight: 700 }}
-              >
-                Продолжить →
-              </Button>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
-                🎁 200 кредитов бесплатно при регистрации
-              </Typography>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button variant="outlined" fullWidth onClick={() => setStep(0)}
+                      sx={{ borderColor: 'rgba(124,58,237,0.4)', color: '#C4B5FD' }}>
+                      ← Назад
+                    </Button>
+                    <Button variant="contained" fullWidth size="large" disabled={!birthPlace}
+                      onClick={() => setStep(2)} sx={{ py: 1.5, fontWeight: 700 }}>
+                      Далее →
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Step 3 — Registration */}
+              {step === 2 && (
+                <Box>
+                  {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
+                    <TextField label="Ваше имя" fullWidth value={name} onChange={e => setName(e.target.value)}
+                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }} />
+                    <TextField label="Email" type="email" fullWidth required value={email} onChange={e => setEmail(e.target.value)}
+                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }} />
+                    <TextField label="Пароль" type="password" fullWidth required value={password} onChange={e => setPassword(e.target.value)}
+                      sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }} />
+                  </Box>
+                  <FormControlLabel
+                    control={<Checkbox checked={consent} onChange={e => setConsent(e.target.checked)} size="small"
+                      sx={{ color: '#7C3AED', '&.Mui-checked': { color: '#7C3AED' } }} />}
+                    label={
+                      <Typography variant="body2" color="text.secondary" textAlign="left">
+                        Я даю согласие на{' '}
+                        <MuiLink component={Link} href="/privacy" sx={{ color: '#9F67FF' }}>обработку персональных данных</MuiLink>
+                        {' '}и принимаю{' '}
+                        <MuiLink component={Link} href="/terms" sx={{ color: '#9F67FF' }}>пользовательское соглашение</MuiLink>
+                      </Typography>
+                    }
+                    sx={{ alignItems: 'flex-start', mb: 2 }}
+                  />
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button variant="outlined" onClick={() => setStep(1)}
+                      sx={{ borderColor: 'rgba(124,58,237,0.4)', color: '#C4B5FD', minWidth: 90 }}>
+                      ← Назад
+                    </Button>
+                    <Button variant="contained" fullWidth size="large"
+                      disabled={!email || !password || !consent || loading}
+                      onClick={handleRegister} sx={{ py: 1.5, fontWeight: 700 }}>
+                      {loading ? <CircularProgress size={24} color="inherit" /> : '🌟 Получить натальную карту'}
+                    </Button>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+                    🎁 200 кредитов бесплатно · Уже есть аккаунт?{' '}
+                    <MuiLink component={Link} href="/login" sx={{ color: '#9F67FF' }}>Войти</MuiLink>
+                  </Typography>
+                </Box>
+              )}
+
             </CardContent>
           </Card>
         </Container>
@@ -189,9 +231,7 @@ export default function Home() {
 
       {/* Features */}
       <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Typography variant="h4" fontWeight={700} textAlign="center" sx={{ mb: 2 }}>
-          Всё что нужно для астрологического анализа
-        </Typography>
+        <Typography variant="h4" fontWeight={700} textAlign="center" sx={{ mb: 2 }}>Всё что нужно для астрологического анализа</Typography>
         <Typography color="text.secondary" textAlign="center" sx={{ mb: 7, maxWidth: 500, mx: 'auto' }}>
           Точные расчёты астрологических карт и интерпретации от искусственного интеллекта
         </Typography>
@@ -214,22 +254,14 @@ export default function Home() {
 
       {/* Tariffs */}
       <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Typography variant="h4" fontWeight={700} textAlign="center" sx={{ mb: 2 }}>
-          Тарифы
-        </Typography>
+        <Typography variant="h4" fontWeight={700} textAlign="center" sx={{ mb: 2 }}>Тарифы</Typography>
         <Typography color="text.secondary" textAlign="center" sx={{ mb: 7 }}>
           Один кредит — один расчёт карты. Без подписки, платишь только за то, что используешь.
         </Typography>
         <Grid container spacing={3} justifyContent="center">
           {tariffs.map(t => (
             <Grid item xs={12} sm={6} md={4} key={t.name}>
-              <Card sx={{
-                bgcolor: t.popular ? 'rgba(124,58,237,0.15)' : '#1A1033',
-                border: t.popular ? '2px solid #7C3AED' : '1px solid rgba(124,58,237,0.2)',
-                borderRadius: 3,
-                height: '100%',
-                position: 'relative',
-              }}>
+              <Card sx={{ bgcolor: t.popular ? 'rgba(124,58,237,0.15)' : '#1A1033', border: t.popular ? '2px solid #7C3AED' : '1px solid rgba(124,58,237,0.2)', borderRadius: 3, height: '100%', position: 'relative' }}>
                 {t.popular && (
                   <Box sx={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', bgcolor: '#7C3AED', color: '#fff', px: 2, py: 0.5, borderRadius: 10, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
                     Популярный
@@ -246,14 +278,8 @@ export default function Home() {
                       <Typography key={feat} variant="body2" sx={{ mb: 1 }}>✅ {feat}</Typography>
                     ))}
                   </Box>
-                  <Button
-                    component={Link}
-                    href="/register"
-                    variant={t.popular ? 'contained' : 'outlined'}
-                    fullWidth
-                    size="large"
-                    sx={t.popular ? {} : { borderColor: '#7C3AED', color: '#C4B5FD' }}
-                  >
+                  <Button component={Link} href="/register" variant={t.popular ? 'contained' : 'outlined'} fullWidth size="large"
+                    sx={t.popular ? {} : { borderColor: '#7C3AED', color: '#C4B5FD' }}>
                     Начать
                   </Button>
                 </CardContent>
@@ -264,7 +290,6 @@ export default function Home() {
       </Container>
 
       <Footer />
-
     </Box>
   );
 }
