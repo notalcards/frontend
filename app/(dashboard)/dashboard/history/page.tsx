@@ -118,9 +118,19 @@ export default function HistoryPage() {
       <Dialog open={!!selected} onClose={() => setSelected(null)} maxWidth="md" fullWidth>
         <DialogTitle>{selected ? TYPE_LABELS[selected.type] : ''}</DialogTitle>
         <DialogContent dividers>
-          <Typography sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
-            {selected?.interpretation}
-          </Typography>
+          <Box
+            sx={{
+              lineHeight: 1.8,
+              color: 'text.secondary',
+              '& h2': { color: '#C4B5FD', fontSize: '1.15rem', fontWeight: 700, mt: 3, mb: 1 },
+              '& h3': { color: '#A78BFA', fontSize: '1rem', fontWeight: 600, mt: 2, mb: 0.5 },
+              '& p': { mb: 1.5 },
+              '& ul': { pl: 2.5, mb: 1.5 },
+              '& li': { mb: 0.5 },
+              '& strong': { color: '#E2E0F0', fontWeight: 600 },
+            }}
+            dangerouslySetInnerHTML={{ __html: selected?.interpretation ?? '' }}
+          />
         </DialogContent>
       </Dialog>
     </Box>
