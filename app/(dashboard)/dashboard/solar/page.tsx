@@ -12,6 +12,7 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
+import PreviousCharts from '@/app/components/PreviousCharts';
 import api from '@/app/lib/api';
 
 interface ChartData { id: number; interpretation: string; created_at: string; profile?: { name: string } }
@@ -22,6 +23,7 @@ export default function SolarPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleGenerate = async () => {
     if (!profileId) { setError('Выберите профиль'); return; }
@@ -30,6 +32,7 @@ export default function SolarPage() {
     try {
       const { data } = await api.post('/charts/generate', { type: 'solar', profile_id: profileId, year: parseInt(year) });
       setChart(data);
+      setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при построении соляра');
@@ -60,6 +63,8 @@ export default function SolarPage() {
       {chart && (
         <ChartResult title="☀️ Соляр" profileName={chart.profile?.name} interpretation={chart.interpretation} createdAt={chart.created_at} />
       )}
+
+      <PreviousCharts key={refreshKey} type="solar" title="📚 Предыдущие соляры" />
     </Box>
   );
 }

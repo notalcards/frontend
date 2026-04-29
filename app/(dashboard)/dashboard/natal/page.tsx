@@ -13,6 +13,7 @@ import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
 import NatalChartSVG from '@/app/components/NatalChartSVG';
+import PreviousCharts from '@/app/components/PreviousCharts';
 import api from '@/app/lib/api';
 
 interface ChartData {
@@ -37,6 +38,7 @@ function NatalPageInner() {
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
   const [autoTriggered, setAutoTriggered] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const auto = searchParams.get('auto') === '1';
 
@@ -54,6 +56,7 @@ function NatalPageInner() {
     try {
       const { data } = await api.post('/charts/generate', { type: 'natal', profile_id: profileId });
       setChart(data.chart ?? data);
+      setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при построении карты');
@@ -144,6 +147,8 @@ function NatalPageInner() {
           />
         </>
       )}
+
+      <PreviousCharts key={refreshKey} type="natal" title="📚 Предыдущие натальные карты" />
     </Box>
   );
 }

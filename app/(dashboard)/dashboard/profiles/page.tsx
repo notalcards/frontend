@@ -16,6 +16,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import CityAutocomplete from '@/app/components/CityAutocomplete';
 import api from '@/app/lib/api';
 
 interface Profile {
@@ -27,7 +28,7 @@ interface Profile {
   is_default: boolean;
 }
 
-const emptyForm = { name: '', birth_date: '', birth_time: '', birth_place: '' };
+const emptyForm = { name: '', birth_date: '', birth_time: '', birth_place: '', lat: undefined, lng: undefined };
 
 export default function ProfilesPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -51,6 +52,8 @@ export default function ProfilesPage() {
         birth_date: form.birth_date,
         birth_time: form.birth_time ? form.birth_time + ':00' : null,
         birth_place: form.birth_place,
+        lat: form.lat,
+        lng: form.lng,
       });
       setForm(emptyForm);
       setShowForm(false);
@@ -111,12 +114,11 @@ export default function ProfilesPage() {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    label="Место рождения (город)"
-                    fullWidth required
+                  <CityAutocomplete
                     value={form.birth_place}
-                    onChange={e => setForm({ ...form, birth_place: e.target.value })}
-                    placeholder="Москва"
+                    onChange={(city, lat, lng) => setForm({ ...form, birth_place: city, lat, lng })}
+                    label="Место рождения (город)"
+                    required
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>

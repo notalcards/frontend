@@ -13,6 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
+import PreviousCharts from '@/app/components/PreviousCharts';
 import api from '@/app/lib/api';
 
 const TABS = [
@@ -29,6 +30,7 @@ export default function HoroscopePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleGenerate = async () => {
     if (!profileId) { setError('Выберите профиль'); return; }
@@ -37,6 +39,7 @@ export default function HoroscopePage() {
     try {
       const { data } = await api.post('/charts/generate', { type: 'monthly', profile_id: profileId, period: TABS[tab].type });
       setChart(data);
+      setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при получении прогноза');
@@ -75,6 +78,8 @@ export default function HoroscopePage() {
           createdAt={chart.created_at}
         />
       )}
+
+      <PreviousCharts type="monthly" title="📚 Предыдущие гороскопы" key={refreshKey} />
     </Box>
   );
 }

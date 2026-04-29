@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
+import PreviousCharts from '@/app/components/PreviousCharts';
 import api from '@/app/lib/api';
 
 interface ChartData { id: number; interpretation: string; created_at: string; profile?: { name: string } }
@@ -20,6 +21,7 @@ export default function VenusPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleGenerate = async () => {
     if (!profileId) { setError('Выберите профиль'); return; }
@@ -28,6 +30,7 @@ export default function VenusPage() {
     try {
       const { data } = await api.post('/charts/generate', { type: 'venus', profile_id: profileId });
       setChart(data);
+      setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при расчёте циклов Венеры');
@@ -57,6 +60,8 @@ export default function VenusPage() {
       {chart && (
         <ChartResult title="💕 Циклы Венеры" profileName={chart.profile?.name} interpretation={chart.interpretation} createdAt={chart.created_at} />
       )}
+
+      <PreviousCharts type="venus" title="📚 Предыдущие расчёты циклов Венеры" key={refreshKey} />
     </Box>
   );
 }

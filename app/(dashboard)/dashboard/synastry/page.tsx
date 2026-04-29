@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import ProfileSelector from '@/app/components/ProfileSelector';
 import ChartResult from '@/app/components/ChartResult';
+import PreviousCharts from '@/app/components/PreviousCharts';
 import api from '@/app/lib/api';
 
 interface ChartData { id: number; interpretation: string; created_at: string; profile?: { name: string } }
@@ -21,6 +22,7 @@ export default function SynastryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chart, setChart] = useState<ChartData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleGenerate = async () => {
     if (!profileId1 || !profileId2) { setError('Выберите оба профиля'); return; }
@@ -30,6 +32,7 @@ export default function SynastryPage() {
     try {
       const { data } = await api.post('/charts/generate', { type: 'synastry', profile_id: profileId1, profile_id2: profileId2 });
       setChart(data);
+      setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Ошибка при расчёте синастрии');
@@ -61,6 +64,8 @@ export default function SynastryPage() {
       {chart && (
         <ChartResult title="💑 Синастрия" interpretation={chart.interpretation} createdAt={chart.created_at} />
       )}
+
+      <PreviousCharts type="synastry" title="📚 Предыдущие синастрии" key={refreshKey} />
     </Box>
   );
 }

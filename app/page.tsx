@@ -17,10 +17,12 @@ import Alert from '@mui/material/Alert';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
+import CityAutocomplete from '@/app/components/CityAutocomplete';
 import api from '@/app/lib/api';
 import { setToken } from '@/app/lib/auth';
 
@@ -39,7 +41,7 @@ const tariffs = [
   { name: 'Профи', price: '990 ₽', credits: 3000, desc: 'Максимум возможностей', features: ['30 расчётов карт', 'Интерпретации от ИИ', 'История карт', 'Синастрия', 'Приоритетный доступ'], popular: false },
 ];
 
-const steps = ['Дата рождения', 'Место рождения', 'Регистрация'];
+const steps = ['Дата рождения', 'Место рождения', 'Готово', 'Получение карты'];
 
 const stepperSx = {
   '& .MuiStepLabel-label': { color: '#A0A0C0', fontSize: 12 },
@@ -60,6 +62,8 @@ export default function Home() {
 
   // Step 2
   const [birthPlace, setBirthPlace] = useState('');
+  const [birthLat, setBirthLat] = useState<number | undefined>();
+  const [birthLng, setBirthLng] = useState<number | undefined>();
 
   // Step 3
   const [name, setName] = useState('');
@@ -80,8 +84,10 @@ export default function Home() {
         birth_date: birthDate,
         birth_time: birthTime ? birthTime + ':00' : null,
         birth_place: birthPlace || 'Не указано',
+        lat: birthLat,
+        lng: birthLng,
       });
-      router.push('/dashboard/natal?auto=1');
+      router.push('/dashboard/natal');
     } catch (err: any) {
       const errors = err.response?.data?.errors;
       setError(errors ? Object.values(errors).flat().join(', ') : err.response?.data?.message || 'Ошибка регистрации');
@@ -136,7 +142,7 @@ export default function Home() {
                   <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid size={{ xs: 12, sm: 7 }}>
                       <TextField
-                        label="Дата рождения" type="date" fullWidth required
+                        label="Дата рождения (ДД/ММ/ГГГГ)" type="date" fullWidth required
                         value={birthDate} onChange={e => setBirthDate(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
                         sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
@@ -144,30 +150,35 @@ export default function Home() {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 5 }}>
                       <TextField
-                        label="Время рождения" type="time" fullWidth
+                        label="Время рождения" type="time" fullWidth required
                         value={birthTime} onChange={e => setBirthTime(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
-                        helperText="Необязательно"
                         sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                       />
                     </Grid>
                   </Grid>
-                  <Button variant="contained" fullWidth size="large" disabled={!birthDate}
+                  <Button variant="contained" fullWidth size="large" disabled={!birthDate || !birthTime}
                     onClick={() => setStep(1)} sx={{ py: 1.5, fontWeight: 700 }}>
                     Далее →
                   </Button>
                 </Box>
               )}
 
-              {/* Step 2 */}
+              {/* Step 2 — Place */}
               {step === 1 && (
                 <Box>
-                  <TextField
-                    label="Город рождения" fullWidth
-                    value={birthPlace} onChange={e => setBirthPlace(e.target.value)}
-                    placeholder="Например: Москва"
-                    sx={{ mb: 3, '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
-                  />
+                  <Box sx={{ mb: 3 }}>
+                    <CityAutocomplete
+                      value={birthPlace}
+                      onChange={(city, lat, lng) => {
+                        setBirthPlace(city);
+                        setBirthLat(lat);
+                        setBirthLng(lng);
+                      }}
+                      label="Город рождения"
+                      required
+                    />
+                  </Box>
                   <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button variant="outlined" fullWidth onClick={() => setStep(0)}
                       sx={{ borderColor: 'rgba(124,58,237,0.4)', color: '#C4B5FD' }}>
@@ -181,8 +192,44 @@ export default function Home() {
                 </Box>
               )}
 
-              {/* Step 3 — Registration */}
+              {/* Step 3 — Chart Ready */}
               {step === 2 && (
+                <Box>
+                  <Box sx={{ textAlign: 'center', mb: 4 }}>
+                    <Typography variant="h5" fontWeight={700} sx={{ mb: 2, color: '#C4B5FD' }}>
+                      ✨ Ваша натальная карта готова!
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Создайте аккаунт, чтобы увидеть полную интерпретацию
+                    </Typography>
+                    <LinearProgress
+                      sx={{
+                        mb: 3,
+                        height: 8,
+                        borderRadius: 4,
+                        bgcolor: 'rgba(124,58,237,0.2)',
+                        '& .MuiLinearProgress-bar': {
+                          bgcolor: 'linear-gradient(90deg, #7C3AED, #C4B5FD)',
+                          background: 'linear-gradient(90deg, #7C3AED, #C4B5FD)',
+                        }
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button variant="outlined" onClick={() => setStep(1)}
+                      sx={{ borderColor: 'rgba(124,58,237,0.4)', color: '#C4B5FD', minWidth: 90 }}>
+                      ← Назад
+                    </Button>
+                    <Button variant="contained" fullWidth size="large"
+                      onClick={() => setStep(3)} sx={{ py: 1.5, fontWeight: 700 }}>
+                      Посмотреть карту →
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Step 4 — Registration */}
+              {step === 3 && (
                 <Box>
                   {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
