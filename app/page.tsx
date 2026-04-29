@@ -21,6 +21,11 @@ import LinearProgress from '@mui/material/LinearProgress';
 import MuiLink from '@mui/material/Link';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/ru';
 import Footer from '@/app/components/Footer';
 import CityAutocomplete from '@/app/components/CityAutocomplete';
 import api from '@/app/lib/api';
@@ -57,7 +62,7 @@ export default function Home() {
   const [step, setStep] = useState(0);
 
   // Step 1
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [birthTime, setBirthTime] = useState('');
 
   // Step 2
@@ -81,7 +86,7 @@ export default function Home() {
       setToken(data.token);
       await api.post('/profiles', {
         name: name || 'Я',
-        birth_date: birthDate,
+        birth_date: birthDate ? birthDate.format('YYYY-MM-DD') : '',
         birth_time: birthTime ? birthTime + ':00' : null,
         birth_place: birthPlace || 'Не указано',
         lat: birthLat,
@@ -141,13 +146,21 @@ export default function Home() {
                 <Box>
                   <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid size={{ xs: 12, sm: 7 }}>
-                      <TextField
-                        label="Дата рождения" type="date" fullWidth required
-                        value={birthDate} onChange={e => setBirthDate(e.target.value)}
-                        slotProps={{ inputLabel: { shrink: true } }}
-                        helperText="Формат: дд.мм.гггг"
-                        sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                        <DatePicker
+                          label="Дата рождения"
+                          value={birthDate}
+                          onChange={(newValue) => setBirthDate(newValue)}
+                          format="DD.MM.YYYY"
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              required: true,
+                              sx: { '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }
+                            }
+                          }}
+                        />
+                      </LocalizationProvider>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 5 }}>
                       <TextField
