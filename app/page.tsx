@@ -142,9 +142,10 @@ export default function Home() {
                   <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid size={{ xs: 12, sm: 7 }}>
                       <TextField
-                        label="Дата рождения (ДД/ММ/ГГГГ)" type="date" fullWidth required
+                        label="Дата рождения" type="date" fullWidth required
                         value={birthDate} onChange={e => setBirthDate(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
+                        placeholder="дд.мм.гггг"
                         sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                       />
                     </Grid>
