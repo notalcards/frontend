@@ -145,7 +145,7 @@ export default function Home() {
                         label="Дата рождения" type="date" fullWidth required
                         value={birthDate} onChange={e => setBirthDate(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
-                        placeholder="дд.мм.гггг"
+                        helperText="Формат: дд.мм.гггг"
                         sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(124,58,237,0.05)' } }}
                       />
                     </Grid>
