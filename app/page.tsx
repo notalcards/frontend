@@ -82,7 +82,7 @@ export default function Home() {
     setError('');
     setLoading(true);
     try {
-      const { data } = await api.post('/register', { name, email, password, password_confirmation: password });
+      const { data } = await api.post('/register', { name: name || 'Пользователь', email, password, password_confirmation: password });
       setToken(data.token);
       await api.post('/profiles', {
         name: name || 'Я',
